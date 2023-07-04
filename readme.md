@@ -122,18 +122,22 @@ function someFunction(arg1, arg2, arg3) {
   arg1 + arg2 + arg3
 }
 ```
+
 A function evaluates to the last expression it evaluated, but you can return early with the `return` keyword. 
 ```function earlyReturn(name) {
     if (name.length < 1) return never
     // Do a whole bunch with name
     transformedName
 }
+```
+
 The return value of a function definition is itself, which ties into closures
 ```
 const maxFunction = function max(left, right) {
     if (left > right) left else right
 }
 ```
+
 Rest and keyword parameters are another stretch goal, though an earlier one than everything involved in static typing & generics. Anonymous functions are also on the nice-to-have list, though more as a convenience feature
 
 ### Closures
@@ -148,6 +152,7 @@ function identity(f) {
 }
 identity(min)(1, 2) // 1
 ```
+
 And closures work similarly, albeit more tersely than in base lox because functions evaluate to themselves
 ```
 function outer(arg) {
@@ -158,3 +163,38 @@ function outer(arg) {
 
 outer(3)() // 3
 ```
+
+## Classes
+Classes look just like base lox
+```
+class Bed {
+    sleep(person) {
+        print("Ah, so soft")
+    }
+
+    init(softness) {
+        this.softness = softness
+    }
+}
+const bed = Bed()
+bed.sleep("me") // Prints "Ah, so soft"
+```
+
+Additionally, classes are first-class (hah), and evaluate to themselves in addition to being accessible by name in their scope
+```
+const someClass = class BedFrame {
+    init(material) {
+        this.material = material
+    }
+}
+const woodFrame = someClass("wood")
+const metalFrame = BedFrame("metal") // Both create BedFrame instances
+```
+
+### Inheritance
+Class inheritance is slightly changed. I have no compunctions with adding extra keywords. You inherit from a class with the `extends` keyword, and call a supertype's constructor with `super.init`
+```
+class Jalapeno extends Fruit {}
+```
+
+As a stretch goal I'd like to add interfaces, though those aren't super important until I add static typing. The same goes for all the other Cool Type System Features; not important yet
