@@ -1,4 +1,4 @@
-# Rusty Lock
+# Goldylox
 
 Personal implementation of the book [Crafting Interpreters](https://craftinginterpreters.com/), except I'm taking a few liberties with the language for my personal sensibilities.
 
@@ -84,5 +84,77 @@ We've got `if`, `else if` and `else`.
 We've got `while`
 And finally we've got `for (const name in sequence)`. None of that 3-statement `for(;;)` from C here. It can be emulated with while loops until I properly implement for-in loops.
 
+You can return early from a loop with `break`
+
+### Everything is an expression
+I've been glossing over it, but I'm modifying lox's semantics a bit, and the biggest change is probably that there are no statements - all expressions evaluate to a value of some kind, which can be stored in a variable.
+For control flow, `if` trees evaluate to the branch they took
+```
+const max = if (left > right) left else right
+```
+On the other hand, `for` and `while` loops evaluate to the last value of the last iteration. 
+```
+const lastId = for (value in sequence) {
+  // do something with value
+  value.id
+}
+```
+```
+const data = while (keepAlive) {
+  // Listen on a port
+  lastData
+}
+```
+When leaving a loop early via `break`, you can put an expression in the break position as though using `return`
+```
+const search = for (value in sequence) {
+    if (value.mass > 199) break value
+    // Implicitly returns never if we hit the end of iteration
+}
+```
+The semantics of loop expression values isn't something I'm set on, but I need to pick something and this is as good as any. The only real alternative I can think of right now is that loops always return `never`, but that partially feels like giving up early
+
 ### Functions
 Function calls are the same as lox: `functionCall(arg1, arg2, arg3)`
+Function definitions are pretty standard
+```
+function someFunction(arg1, arg2, arg3) {
+  arg1 + arg2 + arg3
+}
+```
+A function evaluates to the last expression it evaluated, but you can return early with the `return` keyword. 
+```function earlyReturn(name) {
+    if (name.length < 1) return never
+    // Do a whole bunch with name
+    transformedName
+}
+The return value of a function definition is itself, which ties into closures
+```
+const maxFunction = function max(left, right) {
+    if (left > right) left else right
+}
+```
+Rest and keyword parameters are another stretch goal, though an earlier one than everything involved in static typing & generics. Anonymous functions are also on the nice-to-have list, though more as a convenience feature
+
+### Closures
+Functions are first-class just like in lox
+```
+function min(left, right) {
+    if (left < right) left else right
+}
+
+function identity(f) {
+    f
+}
+identity(min)(1, 2) // 1
+```
+And closures work similarly, albeit more tersely than in base lox because functions evaluate to themselves
+```
+function outer(arg) {
+    function inner() {
+        arg
+    }
+}
+
+outer(3)() // 3
+```
